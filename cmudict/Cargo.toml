@@ -1,0 +1,11 @@
+[package]
+name = "cmudict"
+version = "0.1.0"
+authors = ["Paul Woolcock <paul@woolcock.us>"]
+build = "build.rs"
+
+[dependencies]
+cmudict_core = { path = "../cmudict_core" }
+
+[build-dependencies]
+cmudict_core = { path = "../cmudict_core" }
