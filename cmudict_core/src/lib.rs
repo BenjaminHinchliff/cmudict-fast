@@ -328,16 +328,24 @@ impl FromStr for Symbol {
 
 pub struct Rule {
     label: String,
-    pronounciation: Vec<Symbol>,
+    pronunciation: Vec<Symbol>,
 }
 
 
 impl Rule {
-    pub fn new(label: String, pronounciation: Vec<Symbol>) -> Rule {
+    pub fn new(label: String, pronunciation: Vec<Symbol>) -> Rule {
         Rule {
             label: label,
-            pronounciation: pronounciation,
+            pronunciation: pronunciation,
         }
+    }
+
+    pub fn pronunciation(&self) -> &[Symbol] {
+        &self.pronunciation
+    }
+
+    pub fn label(&self) -> &str {
+        &self.label
     }
 }
 
