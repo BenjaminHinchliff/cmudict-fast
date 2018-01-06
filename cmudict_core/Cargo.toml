@@ -2,3 +2,6 @@
 name = "cmudict_core"
 version = "0.1.0"
 authors = ["Paul Woolcock <paul@woolcock.us>"]
+
+[dependencies]
+error-chain = "0.11.0"

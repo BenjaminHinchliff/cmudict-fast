@@ -1,6 +1,20 @@
+#[macro_use] extern crate error_chain;
+
 use std::str::FromStr;
-use std::error;
 use std::fmt;
+
+pub use errors::*;
+
+mod errors {
+    error_chain!{
+        errors {
+            ParseError(t: String) {
+                description("parse error")
+                display("parse error: {}", t)
+            }
+        }
+    }
+}
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Stress {
@@ -51,21 +65,16 @@ pub enum Symbol {
     ZH,
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub enum Error {
-    ParseError,
+fn parse_error(s: &str) -> Error {
+    ErrorKind::ParseError(s.into()).into()
 }
 
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "ParseError")
-    }
+fn parse_error_expect(before: &str, after: &str, c: char) -> Error {
+    parse_error(&format!("Expected {} after {}, got {}", before, after, c))
 }
 
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        "ParseError"
-    }
+fn parse_error_eof(before: &str, after: &str) -> Error {
+    parse_error(&format!("Expected {} after {}, got EOF", before, after))
 }
 
 macro_rules! parse_stress {
@@ -74,7 +83,7 @@ macro_rules! parse_stress {
             Some('0') | None => Ok($symbol(Stress::None)),
             Some('1') => Ok($symbol(Stress::Primary)),
             Some('2') => Ok($symbol(Stress::Secondary)),
-            Some(_) => Err(Error::ParseError),
+            Some(c) => Err(parse_error(&format!("Expected stress marker '0', '1', or '2', got {}", c))),
         }
     }}
 }
@@ -213,11 +222,11 @@ impl fmt::Display for Symbol {
 impl FromStr for Symbol {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Symbol, Error> {
+    fn from_str(s: &str) -> Result<Symbol> {
         let mut chrs = s.chars();
 
         match chrs.next() {
-            None => Err(Error::ParseError),
+            None => Err(ErrorKind::ParseError("Expected character, got EOF".into()).into()),
             Some('A') => {
                 match chrs.next() {
                     Some('A') => parse_stress!( chrs.next(), Symbol::AA ),
@@ -225,7 +234,8 @@ impl FromStr for Symbol {
                     Some('O') => parse_stress!( chrs.next(), Symbol::AO ),
                     Some('W') => parse_stress!( chrs.next(), Symbol::AW ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::AY ),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("A, H, O, W, or Y", "A", c)),
+                    None => Err(parse_error_eof("A, H, O, W, or Y", "A")),
                 }
             },
             Some('E') => {
@@ -233,42 +243,47 @@ impl FromStr for Symbol {
                     Some('H') => parse_stress!( chrs.next(), Symbol::EH ),
                     Some('R') => parse_stress!( chrs.next(), Symbol::ER ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::EY ),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H, R, or Y", "E", c)),
+                    None => Err(parse_error_eof("H, R, or Y", "E")),
                 }
             },
             Some('I') => {
                 match chrs.next() {
                     Some('H') => parse_stress!( chrs.next(), Symbol::IH ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::IY ),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H or Y", "I", c)),
+                    None => Err(parse_error_eof("H or Y", "I")),
                 }
             },
             Some('O') => {
                 match chrs.next() {
                     Some('W') => parse_stress!( chrs.next(), Symbol::OW ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::OY ),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("W or Y", "O", c)),
+                    None => Err(parse_error_eof("W or Y", "O")),
                 }
             },
             Some('U') => {
                 match chrs.next() {
                     Some('H') => parse_stress!( chrs.next(), Symbol::UH ),
                     Some('W') => parse_stress!( chrs.next(), Symbol::UW ),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H or W", "U", c)),
+                    None => Err(parse_error_eof("H or W", "U")),
                 }
             },
             Some('B') => Ok(Symbol::B),
             Some('C') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::CH),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H", "C", c)),
+                    None => Err(parse_error_eof("H", "C")),
                 }
             },
             Some('D') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::DH),
                     None => Ok(Symbol::D),
-                    Some(_) => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H or EOF", "D", c)),
                 }
             },
             Some('F') => Ok(Symbol::F),
@@ -276,13 +291,15 @@ impl FromStr for Symbol {
             Some('H') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::HH),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H", "H", c)),
+                    None => Err(parse_error_eof("H", "H")),
                 }
             },
             Some('J') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::JH),
-                    Some(_) | None => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H", "J", c)),
+                    None => Err(parse_error_eof("H", "J")),
                 }
             },
             Some('K') => Ok(Symbol::K),
@@ -292,7 +309,7 @@ impl FromStr for Symbol {
                 match chrs.next() {
                     Some('G') => Ok(Symbol::NG),
                     None => Ok(Symbol::N),
-                    Some(_) => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("G or EOF", "N", c)),
                 }
             },
             Some('P') => Ok(Symbol::P),
@@ -301,14 +318,14 @@ impl FromStr for Symbol {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::SH),
                     None => Ok(Symbol::S),
-                    Some(_) => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H or EOF", "S", c)),
                 }
             },
             Some('T') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::TH),
                     None => Ok(Symbol::T),
-                    Some(_) => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H or EOF", "T", c)),
                 }
             },
             Some('V') => Ok(Symbol::V),
@@ -318,10 +335,10 @@ impl FromStr for Symbol {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::ZH),
                     None => Ok(Symbol::Z),
-                    Some(_) => Err(Error::ParseError),
+                    Some(c) => Err(parse_error_expect("H or EOF", "Z", c)),
                 }
             },
-            Some(_) => Err(Error::ParseError),
+            Some(c) => Err(parse_error(&format!("Expected A-Z, got {}", c))),
         }
     }
 }
@@ -361,11 +378,11 @@ impl FromStr for Rule {
     /// WORD A B C
     /// ```
     ///
-    fn from_str(s: &str) -> Result<Rule, Error> {
+    fn from_str(s: &str) -> Result<Rule> {
         let mut iter = s.split_whitespace().filter(|s| !s.is_empty());
-        let label = iter.next().ok_or(Error::ParseError)?;
+        let label = iter.next().ok_or(parse_error(&format!("Expected label, found EOF")))?;
 
-        let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<Result<Vec<_>, Error>>()?;
+        let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<Result<Vec<_>>>()?;
 
         Ok(Rule::new(label.to_string(), symbols))
     }
