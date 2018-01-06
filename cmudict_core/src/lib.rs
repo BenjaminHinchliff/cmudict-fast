@@ -11,44 +11,44 @@ pub enum Stress {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Symbol {
-    AA(String, Stress),
-    AH(String, Stress),
-    AO(String, Stress),
-    AW(String, Stress),
-    AY(String, Stress),
-    B(String),
-    CH(String),
-    D(String),
-    DH(String),
-    EH(String, Stress),
-    ER(String, Stress),
-    EY(String, Stress),
-    F(String),
-    G(String),
-    HH(String),
-    IH(String, Stress),
-    IY(String, Stress),
-    JH(String),
-    K(String),
-    L(String),
-    M(String),
-    N(String),
-    NG(String),
-    OW(String, Stress),
-    OY(String, Stress),
-    P(String),
-    R(String),
-    S(String),
-    SH(String),
-    T(String),
-    TH(String),
-    UH(String, Stress),
-    UW(String, Stress),
-    V(String),
-    W(String),
-    Y(String),
-    Z(String),
-    ZH(String),
+    AA(Stress),
+    AH(Stress),
+    AO(Stress),
+    AW(Stress),
+    AY(Stress),
+    B,
+    CH,
+    D,
+    DH,
+    EH(Stress),
+    ER(Stress),
+    EY(Stress),
+    F,
+    G,
+    HH,
+    IH(Stress),
+    IY(Stress),
+    JH,
+    K,
+    L,
+    M,
+    N,
+    NG,
+    OW(Stress),
+    OY(Stress),
+    P,
+    R,
+    S,
+    SH,
+    T,
+    TH,
+    UH(Stress),
+    UW(Stress),
+    V,
+    W,
+    Y,
+    Z,
+    ZH,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -69,11 +69,11 @@ impl error::Error for Error {
 }
 
 macro_rules! parse_stress {
-    ( $next:expr, $symbol:expr, $name:expr ) => {{
+    ( $next:expr, $symbol:expr ) => {{
         match $next {
-            Some('0') | None => Ok($symbol($name, Stress::None)),
-            Some('1') => Ok($symbol($name, Stress::Primary)),
-            Some('2') => Ok($symbol($name, Stress::Secondary)),
+            Some('0') | None => Ok($symbol(Stress::None)),
+            Some('1') => Ok($symbol(Stress::Primary)),
+            Some('2') => Ok($symbol(Stress::Secondary)),
             Some(_) => Err(Error::ParseError),
         }
     }}
@@ -92,119 +92,119 @@ impl fmt::Display for Stress {
 impl fmt::Display for Symbol {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Symbol::AA(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::AA(ref s1) => {
+                write!(f, "AA{}", s1)
             },
-            Symbol::AH(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::AH(ref s1) => {
+                write!(f, "AH{}", s1)
             },
-            Symbol::AO(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::AO(ref s1) => {
+                write!(f, "AO{}", s1)
             },
-            Symbol::AW(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::AW(ref s1) => {
+                write!(f, "AW{}", s1)
             },
-            Symbol::AY(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::AY(ref s1) => {
+                write!(f, "AY{}", s1)
             },
-            Symbol::B(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::B => {
+                write!(f, "B")
             },
-            Symbol::CH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::CH => {
+                write!(f, "CH")
             },
-            Symbol::D(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::D => {
+                write!(f, "D")
             },
-            Symbol::DH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::DH => {
+                write!(f, "DH")
             },
-            Symbol::EH(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::EH(ref s1) => {
+                write!(f, "EH{}", s1)
             },
-            Symbol::ER(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::ER(ref s1) => {
+                write!(f, "ER{}", s1)
             },
-            Symbol::EY(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::EY(ref s1) => {
+                write!(f, "EY{}", s1)
             },
-            Symbol::F(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::F => {
+                write!(f, "F")
             },
-            Symbol::G(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::G => {
+                write!(f, "G")
             },
-            Symbol::HH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::HH => {
+                write!(f, "HH")
             },
-            Symbol::IH(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::IH(ref s1) => {
+                write!(f, "IH{}", s1)
             },
-            Symbol::IY(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::IY(ref s1) => {
+                write!(f, "IY{}", s1)
             },
-            Symbol::JH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::JH => {
+                write!(f, "JH")
             },
-            Symbol::K(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::K => {
+                write!(f, "K")
             },
-            Symbol::L(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::L => {
+                write!(f, "L")
             },
-            Symbol::M(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::M => {
+                write!(f, "M")
             },
-            Symbol::N(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::N => {
+                write!(f, "N")
             },
-            Symbol::NG(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::NG => {
+                write!(f, "NG")
             },
-            Symbol::OW(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::OW(ref s1) => {
+                write!(f, "OW{}", s1)
             },
-            Symbol::OY(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::OY(ref s1) => {
+                write!(f, "OY{}", s1)
             },
-            Symbol::P(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::P => {
+                write!(f, "P")
             },
-            Symbol::R(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::R => {
+                write!(f, "R")
             },
-            Symbol::S(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::S => {
+                write!(f, "S")
             },
-            Symbol::SH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::SH => {
+                write!(f, "SH")
             },
-            Symbol::T(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::T => {
+                write!(f, "T")
             },
-            Symbol::TH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::TH => {
+                write!(f, "TH")
             },
-            Symbol::UH(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::UH(ref s1) => {
+                write!(f, "UH{}", s1)
             },
-            Symbol::UW(ref s1, ref s2) => {
-                write!(f, "{}{}", s1, s2)
+            Symbol::UW(ref s1) => {
+                write!(f, "UW{}", s1)
             },
-            Symbol::V(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::V => {
+                write!(f, "V")
             },
-            Symbol::W(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::W => {
+                write!(f, "W")
             },
-            Symbol::Y(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::Y => {
+                write!(f, "Y")
             },
-            Symbol::Z(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::Z => {
+                write!(f, "Z")
             },
-            Symbol::ZH(ref s1) => {
-                write!(f, "{}", s1)
+            Symbol::ZH => {
+                write!(f, "ZH")
             },
         }
     }
@@ -220,104 +220,104 @@ impl FromStr for Symbol {
             None => Err(Error::ParseError),
             Some('A') => {
                 match chrs.next() {
-                    Some('A') => parse_stress!( chrs.next(), Symbol::AA, String::from(s) ),
-                    Some('H') => parse_stress!( chrs.next(), Symbol::AH, String::from(s) ),
-                    Some('O') => parse_stress!( chrs.next(), Symbol::AO, String::from(s) ),
-                    Some('W') => parse_stress!( chrs.next(), Symbol::AW, String::from(s) ),
-                    Some('Y') => parse_stress!( chrs.next(), Symbol::AY, String::from(s) ),
+                    Some('A') => parse_stress!( chrs.next(), Symbol::AA ),
+                    Some('H') => parse_stress!( chrs.next(), Symbol::AH ),
+                    Some('O') => parse_stress!( chrs.next(), Symbol::AO ),
+                    Some('W') => parse_stress!( chrs.next(), Symbol::AW ),
+                    Some('Y') => parse_stress!( chrs.next(), Symbol::AY ),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
             Some('E') => {
                 match chrs.next() {
-                    Some('H') => parse_stress!( chrs.next(), Symbol::EH, String::from(s) ),
-                    Some('R') => parse_stress!( chrs.next(), Symbol::ER, String::from(s) ),
-                    Some('Y') => parse_stress!( chrs.next(), Symbol::EY, String::from(s) ),
+                    Some('H') => parse_stress!( chrs.next(), Symbol::EH ),
+                    Some('R') => parse_stress!( chrs.next(), Symbol::ER ),
+                    Some('Y') => parse_stress!( chrs.next(), Symbol::EY ),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
             Some('I') => {
                 match chrs.next() {
-                    Some('H') => parse_stress!( chrs.next(), Symbol::IH, String::from(s) ),
-                    Some('Y') => parse_stress!( chrs.next(), Symbol::IY, String::from(s) ),
+                    Some('H') => parse_stress!( chrs.next(), Symbol::IH ),
+                    Some('Y') => parse_stress!( chrs.next(), Symbol::IY ),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
             Some('O') => {
                 match chrs.next() {
-                    Some('W') => parse_stress!( chrs.next(), Symbol::OW, String::from(s) ),
-                    Some('Y') => parse_stress!( chrs.next(), Symbol::OY, String::from(s) ),
+                    Some('W') => parse_stress!( chrs.next(), Symbol::OW ),
+                    Some('Y') => parse_stress!( chrs.next(), Symbol::OY ),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
             Some('U') => {
                 match chrs.next() {
-                    Some('H') => parse_stress!( chrs.next(), Symbol::UH, String::from(s) ),
-                    Some('W') => parse_stress!( chrs.next(), Symbol::UW, String::from(s) ),
+                    Some('H') => parse_stress!( chrs.next(), Symbol::UH ),
+                    Some('W') => parse_stress!( chrs.next(), Symbol::UW ),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
-            Some('B') => Ok(Symbol::B(String::from(s))),
+            Some('B') => Ok(Symbol::B),
             Some('C') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::CH(String::from(s))),
+                    Some('H') => Ok(Symbol::CH),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
             Some('D') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::DH(String::from(s))),
-                    None => Ok(Symbol::D(String::from(s))),
+                    Some('H') => Ok(Symbol::DH),
+                    None => Ok(Symbol::D),
                     Some(_) => Err(Error::ParseError),
                 }
             },
-            Some('F') => Ok(Symbol::F(String::from(s))),
-            Some('G') => Ok(Symbol::G(String::from(s))),
+            Some('F') => Ok(Symbol::F),
+            Some('G') => Ok(Symbol::G),
             Some('H') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::HH(String::from(s))),
+                    Some('H') => Ok(Symbol::HH),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
             Some('J') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::JH(String::from(s))),
+                    Some('H') => Ok(Symbol::JH),
                     Some(_) | None => Err(Error::ParseError),
                 }
             },
-            Some('K') => Ok(Symbol::K(String::from(s))),
-            Some('L') => Ok(Symbol::L(String::from(s))),
-            Some('M') => Ok(Symbol::M(String::from(s))),
+            Some('K') => Ok(Symbol::K),
+            Some('L') => Ok(Symbol::L),
+            Some('M') => Ok(Symbol::M),
             Some('N') => {
                 match chrs.next() {
-                    Some('G') => Ok(Symbol::NG(String::from(s))),
-                    None => Ok(Symbol::N(String::from(s))),
+                    Some('G') => Ok(Symbol::NG),
+                    None => Ok(Symbol::N),
                     Some(_) => Err(Error::ParseError),
                 }
             },
-            Some('P') => Ok(Symbol::P(String::from(s))),
-            Some('R') => Ok(Symbol::R(String::from(s))),
+            Some('P') => Ok(Symbol::P),
+            Some('R') => Ok(Symbol::R),
             Some('S') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::SH(String::from(s))),
-                    None => Ok(Symbol::S(String::from(s))),
+                    Some('H') => Ok(Symbol::SH),
+                    None => Ok(Symbol::S),
                     Some(_) => Err(Error::ParseError),
                 }
             },
             Some('T') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::TH(String::from(s))),
-                    None => Ok(Symbol::T(String::from(s))),
+                    Some('H') => Ok(Symbol::TH),
+                    None => Ok(Symbol::T),
                     Some(_) => Err(Error::ParseError),
                 }
             },
-            Some('V') => Ok(Symbol::V(String::from(s))),
-            Some('W') => Ok(Symbol::W(String::from(s))),
-            Some('Y') => Ok(Symbol::Y(String::from(s))),
+            Some('V') => Ok(Symbol::V),
+            Some('W') => Ok(Symbol::W),
+            Some('Y') => Ok(Symbol::Y),
             Some('Z') => {
                 match chrs.next() {
-                    Some('H') => Ok(Symbol::ZH(String::from(s))),
-                    None => Ok(Symbol::Z(String::from(s))),
+                    Some('H') => Ok(Symbol::ZH),
+                    None => Ok(Symbol::Z),
                     Some(_) => Err(Error::ParseError),
                 }
             },
@@ -362,7 +362,7 @@ impl FromStr for Rule {
     /// ```
     ///
     fn from_str(s: &str) -> Result<Rule, Error> {
-        let mut iter = s.split_whitespace();
+        let mut iter = s.split_whitespace().filter(|s| !s.is_empty());
         let label = iter.next().ok_or(Error::ParseError)?;
 
         let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<Result<Vec<_>, Error>>()?;
@@ -381,7 +381,7 @@ mod tests {
         let dh = "DH";
         let converted = Symbol::from_str(dh);
         assert!(converted.is_ok());
-        assert_eq!(converted.unwrap(), Symbol::DH("DH".to_string()));
+        assert_eq!(converted.unwrap(), Symbol::DH);
     }
 
     #[test]
@@ -389,7 +389,7 @@ mod tests {
         let aa = "AA1";
         let converted = Symbol::from_str(aa);
         assert!(converted.is_ok());
-        assert_eq!(converted.unwrap(), Symbol::AA("AA1".to_string(), Stress::Primary));
+        assert_eq!(converted.unwrap(), Symbol::AA(Stress::Primary));
     }
 
     #[test]
@@ -399,10 +399,10 @@ mod tests {
         assert_eq!(
                 converted,
                 vec![
-                    Symbol::AA("AA1".to_string(), Stress::Primary),
-                    Symbol::K("K".to_string()),
-                    Symbol::L("L".to_string()),
-                    Symbol::TH("TH".to_string()),
+                    Symbol::AA(Stress::Primary),
+                    Symbol::K,
+                    Symbol::L,
+                    Symbol::TH,
                 ]
         );
     }

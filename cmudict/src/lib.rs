@@ -150,11 +150,11 @@ mod tests {
                 Some(Rule::new(
                     "abc".to_string(),
                     vec![
-                        Symbol::EY("EY1".into(), Stress::Primary),
-                        Symbol::B("B".into()),
-                        Symbol::IY("IY2".into(), Stress::Secondary),
-                        Symbol::S("S".into()),
-                        Symbol::IY("IY2".into(), Stress::Secondary)
+                        Symbol::EY(Stress::Primary),
+                        Symbol::B,
+                        Symbol::IY(Stress::Secondary),
+                        Symbol::S,
+                        Symbol::IY(Stress::Secondary)
                     ]
                 )));
         let abf = d.get("abf");
