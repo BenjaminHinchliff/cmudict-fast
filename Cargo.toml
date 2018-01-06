@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "cmudict_core/",
+    "cmudict/",
+]

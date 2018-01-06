@@ -326,6 +326,7 @@ impl FromStr for Symbol {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
     label: String,
     pronunciation: Vec<Symbol>,
@@ -346,6 +347,27 @@ impl Rule {
 
     pub fn label(&self) -> &str {
         &self.label
+    }
+}
+
+impl FromStr for Rule {
+    type Err = Error;
+
+    /// Takes a line from the cmudict and turns it into a `Rule`.
+    ///
+    /// Format needs to be
+    ///
+    /// ```ignore
+    /// WORD A B C
+    /// ```
+    ///
+    fn from_str(s: &str) -> Result<Rule, Error> {
+        let mut iter = s.split_whitespace();
+        let label = iter.next().ok_or(Error::ParseError)?;
+
+        let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<Result<Vec<_>, Error>>()?;
+
+        Ok(Rule::new(label.to_string(), symbols))
     }
 }
 
