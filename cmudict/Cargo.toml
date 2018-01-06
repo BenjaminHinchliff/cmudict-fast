@@ -11,7 +11,7 @@ Library for using the CMUSphinx pronunciation dictionary
 """
 
 [dependencies]
-cmudict_core = { path = "../cmudict_core" }
+cmudict_core = "0.1.0"
 indexed-line-reader = "0.2.0"
 error-chain = "0.11.0"
 reqwest = "0.8.2"
