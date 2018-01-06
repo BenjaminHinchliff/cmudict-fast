@@ -1,3 +1,6 @@
+//! Core part of the cmudict crate
+//!
+//! This crate contains the logic to parse & construct "rules" from the cmudict text database
 #[macro_use] extern crate error_chain;
 
 use std::str::FromStr;
@@ -16,6 +19,7 @@ mod errors {
     }
 }
 
+/// Used by a symbol to indicate what kind of stress it has
 #[derive(Debug, PartialEq, Clone)]
 pub enum Stress {
     None,
@@ -23,6 +27,7 @@ pub enum Stress {
     Secondary,
 }
 
+/// Represents a single sound
 #[derive(Debug, PartialEq, Clone)]
 pub enum Symbol {
     AA(Stress),
@@ -343,6 +348,7 @@ impl FromStr for Symbol {
     }
 }
 
+/// Represents the complete pronunciation of a single word in the database
 #[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
     label: String,
@@ -351,6 +357,7 @@ pub struct Rule {
 
 
 impl Rule {
+    #[doc(hidden)]
     pub fn new<I: Into<String>>(label: I, pronunciation: Vec<Symbol>) -> Rule {
         Rule {
             label: label.into(),
@@ -358,10 +365,12 @@ impl Rule {
         }
     }
 
+    /// Retuns a slice of the Symbols for the word
     pub fn pronunciation(&self) -> &[Symbol] {
         &self.pronunciation
     }
 
+    /// Returns the word
     pub fn label(&self) -> &str {
         &self.label
     }
@@ -370,14 +379,6 @@ impl Rule {
 impl FromStr for Rule {
     type Err = Error;
 
-    /// Takes a line from the cmudict and turns it into a `Rule`.
-    ///
-    /// Format needs to be
-    ///
-    /// ```ignore
-    /// WORD A B C
-    /// ```
-    ///
     fn from_str(s: &str) -> Result<Rule> {
         let mut iter = s.split_whitespace().filter(|s| !s.is_empty());
         let label = iter.next().ok_or(parse_error(&format!("Expected label, found EOF")))?;
