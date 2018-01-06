@@ -1,5 +1,8 @@
+//! The pronunciation dictionary from Carnegie Mellon University's CMUSphinx project
 extern crate cmudict_core;
 extern crate indexed_line_reader;
+extern crate reqwest;
+extern crate tempdir;
 #[macro_use] extern crate error_chain;
 
 use std::str::FromStr;
@@ -10,13 +13,16 @@ use std::convert::AsRef;
 use std::path::{Path, PathBuf};
 use std::collections::{BTreeMap, HashSet};
 
+use tempdir::TempDir;
 use indexed_line_reader::IndexedLineReader;
-use cmudict_core::Rule;
 
-use errors::*;
+pub use cmudict_core::{Rule, Stress, Symbol};
+
+pub use errors::*;
 
 mod errors;
 
+/// A dictionary containing words & their pronunciations
 #[derive(Debug)]
 pub struct Cmudict {
     index: BTreeMap<String, (usize, usize)>,
@@ -25,6 +31,27 @@ pub struct Cmudict {
 }
 
 impl Cmudict {
+    /// Takes a path to a cmudict file and tries to construct a `Cmudict` struct
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// extern crate cmudict;
+    /// use cmudict::Cmudict;
+    /// # use cmudict::Result;
+    /// #
+    /// # fn main() {
+    /// #   if let Err(_) = run() {
+    /// #     panic!("error!");
+    /// #   }
+    /// # }
+    /// # fn run() -> Result<()> {
+    ///
+    /// let dict = Cmudict::new("./resources/cmudict.dict")?;
+    ///
+    /// #   Ok(())
+    /// # }
+    /// ```
     pub fn new<P: AsRef<Path>>(dict: P) -> Result<Cmudict> {
         let path = dict.as_ref();
         let index = make_index(&path)?;
@@ -37,6 +64,40 @@ impl Cmudict {
         })
     }
 
+    /// Downloads the latest cmudict from https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict
+    /// and uses it to construct a new `Cmudict` struct
+    ///
+    /// NB: this will create a temporary directory (using https://crates.io/crates/tempdir) to
+    /// place the dictionary in
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate cmudict;
+    /// use cmudict::Cmudict;
+    /// # use cmudict::Result;
+    /// # 
+    /// # fn main() {
+    /// #   if let Err(_) = run() {
+    /// #     panic!("error");
+    /// #   }
+    /// # }
+    /// # fn run() -> Result<()> {
+    ///
+    /// let dict = Cmudict::download()?;
+    ///
+    /// #   Ok(())
+    /// # }
+    /// ```
+    pub fn download() -> Result<Cmudict> {
+        let tmpdir = TempDir::new("cmudict")?;
+        let path = tmpdir.path().join("cmudict.dict");
+        let mut file = OpenOptions::new().create(true).write(true).open(&path)?;
+        let mut r = reqwest::get("https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict")?;
+        r.copy_to(&mut file)?;
+        Cmudict::new(&path)
+    }
+
     fn get_index_val(&self, s: &str) -> Option<(usize, usize)> {
         let idx = if s.len() < 2 {
             self.index.get(&s[..]).map(|u| *u)
@@ -46,14 +107,43 @@ impl Cmudict {
         idx
     }
 
+    /// Look for a word in the dictionary, and retrieve it's pronunciation
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate cmudict;
+    ///
+    /// use cmudict::{Cmudict, Symbol, Stress};
+    /// # use cmudict::Result;
+    /// # 
+    /// # fn main() {
+    /// #   if let Err(_) = run() {
+    /// #     panic!("error");
+    /// #   }
+    /// # }
+    /// # fn run() -> Result<()> {
+    ///
+    /// let dict = Cmudict::new("./resources/cmudict.dict")?;
+    /// let rust = dict.get("rust");
+    ///
+    /// assert!(rust.is_some());
+    /// assert_eq!(
+    ///     rust.unwrap().pronunciation(),
+    ///     &[Symbol::R,
+    ///       Symbol::AH(Stress::Primary),
+    ///       Symbol::S,
+    ///       Symbol::T]
+    /// );
+    /// #   Ok(())
+    /// # }
+    /// ```
     pub fn get(&self, s: &str) -> Option<Rule> {
         self.get_index_val(s).and_then(|(start, end)| {
             let mut reader = self.line_index.borrow_mut();
             if let Err(_) = reader.seek(SeekFrom::Start(start as u64)) {
                 return None;
             };
-            // need to change something, right now a value that doesn't exist means this is going
-            // to search all the way to the end
             loop {
                 let mut line = String::new();
                 if reader.read_line(&mut line).is_err() {
@@ -144,6 +234,26 @@ mod tests {
     #[test]
     fn test_basics() {
         let d = Cmudict::new("./resources/cmudict.dict").expect("Could not create Cmudict");
+        let abc = d.get("abc");
+        assert!(abc.is_some());
+        assert_eq!(abc,
+                Some(Rule::new(
+                    "abc".to_string(),
+                    vec![
+                        Symbol::EY(Stress::Primary),
+                        Symbol::B,
+                        Symbol::IY(Stress::Secondary),
+                        Symbol::S,
+                        Symbol::IY(Stress::Secondary)
+                    ]
+                )));
+        let abf = d.get("abf");
+        assert!(abf.is_none());
+    }
+
+    #[test]
+    fn using_tempdir() {
+        let d = Cmudict::download().expect("Could not create Cmudict");
         let abc = d.get("abc");
         assert!(abc.is_some());
         assert_eq!(abc,

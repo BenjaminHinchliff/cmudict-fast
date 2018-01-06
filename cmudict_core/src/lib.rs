@@ -351,9 +351,9 @@ pub struct Rule {
 
 
 impl Rule {
-    pub fn new(label: String, pronunciation: Vec<Symbol>) -> Rule {
+    pub fn new<I: Into<String>>(label: I, pronunciation: Vec<Symbol>) -> Rule {
         Rule {
-            label: label,
+            label: label.into(),
             pronunciation: pronunciation,
         }
     }
