@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/cmudict.svg)](https://crates.io/crates/cmudict)
 
-This is a rust library for getting pronunciations from the [CMUSphinx](1)
+This is a rust library for getting pronunciations from the [CMUSphinx][1]
 pronunciation dictionary.
 
 ## Installation
@@ -49,4 +49,4 @@ fn main() {
 }
 ```
 
-1: https://github.com/cmusphinx/cmudict
+[1]: https://github.com/cmusphinx/cmudict
