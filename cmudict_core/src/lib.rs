@@ -31,6 +31,7 @@ pub enum Stress {
 #[derive(Debug, PartialEq, Clone)]
 pub enum Symbol {
     AA(Stress),
+    AE(Stress),
     AH(Stress),
     AO(Stress),
     AW(Stress),
@@ -108,6 +109,9 @@ impl fmt::Display for Symbol {
         match *self {
             Symbol::AA(ref s1) => {
                 write!(f, "AA{}", s1)
+            },
+            Symbol::AE(ref s1) => {
+                write!(f, "AE{}", s1)
             },
             Symbol::AH(ref s1) => {
                 write!(f, "AH{}", s1)
@@ -235,12 +239,13 @@ impl FromStr for Symbol {
             Some('A') => {
                 match chrs.next() {
                     Some('A') => parse_stress!( chrs.next(), Symbol::AA ),
+                    Some('E') => parse_stress!( chrs.next(), Symbol::AE ),
                     Some('H') => parse_stress!( chrs.next(), Symbol::AH ),
                     Some('O') => parse_stress!( chrs.next(), Symbol::AO ),
                     Some('W') => parse_stress!( chrs.next(), Symbol::AW ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::AY ),
-                    Some(c) => Err(parse_error_expect("A, H, O, W, or Y", "A", c)),
-                    None => Err(parse_error_eof("A, H, O, W, or Y", "A")),
+                    Some(c) => Err(parse_error_expect("A, E, H, O, W, or Y", "A", c)),
+                    None => Err(parse_error_eof("A, E, H, O, W, or Y", "A")),
                 }
             },
             Some('E') => {
