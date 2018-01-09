@@ -49,4 +49,18 @@ fn main() {
 }
 ```
 
+You can retrieve the pronunciation for a word like this:
+
+```rust,ignore
+extern crate cmudict;
+
+use cmudict::Cmudict;
+
+fn main() {
+  let dict = Cmudict::download().expect("Couldn't get/make Cmudict");
+  let word = dict.get("apple").unwrap().pronunciation();
+  println!("{:?}", word); // &[Symbol::AE(Stress::Primary), Symbol::P, Symbol::AH(Stress::None), Symbol::L]
+}
+```
+
 [1]: https://github.com/cmusphinx/cmudict
