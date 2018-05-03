@@ -3,6 +3,7 @@ extern crate cmudict_core;
 extern crate indexed_line_reader;
 extern crate reqwest;
 extern crate tempdir;
+extern crate radix_trie;
 #[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 
@@ -13,8 +14,9 @@ use std::io::{BufReader, BufRead, Seek, SeekFrom};
 use std::fs::{OpenOptions, File};
 use std::convert::AsRef;
 use std::path::{Path, PathBuf};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::HashSet;
 
+use radix_trie::Trie;
 use tempdir::TempDir;
 use indexed_line_reader::IndexedLineReader;
 
@@ -24,12 +26,13 @@ pub use errors::*;
 
 mod errors;
 
+/// 
 pub type Index = Mutex<RefCell<IndexedLineReader<BufReader<File>>>>;
 
 /// A dictionary containing words & their pronunciations
 #[derive(Debug)]
 pub struct Cmudict {
-    index: BTreeMap<String, (usize, usize)>,
+    index: Trie<String, (usize, usize)>,
     fname: PathBuf,
     line_index: Index,
 }
@@ -195,16 +198,17 @@ impl Cmudict {
 
 /* Helper functions */
 
+// splits a line on the first space character, and returns the left side
 fn left(s: &str) -> Option<&str> {
     let mut parts = s.splitn(2, ' ');
     parts.next()
 }
 
-fn make_index<P: AsRef<Path>>(file: P) -> Result<BTreeMap<String, (usize, usize)>> {
+fn make_index<P: AsRef<Path>>(file: P) -> Result<Trie<String, (usize, usize)>> {
     let file = OpenOptions::new().read(true).open(&file)?;
     let reader = BufReader::new(file);
     let mut seen = HashSet::new();
-    let mut map = BTreeMap::new();
+    let mut map = Trie::new();
     let mut start = None;
     for (idx, line) in reader.lines().enumerate() {
         let line = line?;
