@@ -1,20 +1,25 @@
 //! Core part of the cmudict crate
 //!
 //! This crate contains the logic to parse & construct "rules" from the cmudict text database
-#[macro_use] extern crate error_chain;
+#[macro_use] extern crate failure;
 
 use std::str::FromStr;
 use std::fmt;
 
+use failure::Error;
+
 pub use errors::*;
 
+pub type Result<T> = ::std::result::Result<T, Error>;
+
 mod errors {
-    error_chain!{
-        errors {
-            ParseError(t: String) {
-                description("parse error")
-                display("parse error: {}", t)
-            }
+    #[derive(Debug, Clone, Fail, PartialEq)]
+    #[fail(display = "parse error: {}", _0)]
+    pub struct ParseError(String);
+
+    impl ParseError {
+        pub fn new(s: &str) -> ParseError {
+            ParseError(s.into())
         }
     }
 }
@@ -72,7 +77,7 @@ pub enum Symbol {
 }
 
 fn parse_error(s: &str) -> Error {
-    ErrorKind::ParseError(s.into()).into()
+    ParseError::new(s).into()
 }
 
 fn parse_error_expect(before: &str, after: &str, c: char) -> Error {
@@ -235,7 +240,7 @@ impl FromStr for Symbol {
         let mut chrs = s.chars();
 
         match chrs.next() {
-            None => Err(ErrorKind::ParseError("Expected character, got EOF".into()).into()),
+            None => Err(parse_error("Expected character, got EOF")),
             Some('A') => {
                 match chrs.next() {
                     Some('A') => parse_stress!( chrs.next(), Symbol::AA ),
