@@ -259,21 +259,18 @@ mod tests {
     #[test]
     fn test_basics() {
         let d = Cmudict::new("./resources/cmudict.dict").expect("Could not create Cmudict");
-        let abc = d.get("apple");
-        assert!(abc.is_some());
-        /*
-        assert_eq!(abc,
+        let apple = d.get("apple");
+        assert!(apple.is_some());
+        assert_eq!(apple,
                 Some(Rule::new(
                     "apple".to_string(),
                     vec![
-                        Symbol::EY(Stress::Primary),
-                        Symbol::B,
-                        Symbol::IY(Stress::Secondary),
-                        Symbol::S,
-                        Symbol::IY(Stress::Secondary)
+                        Symbol::AE(Stress::Primary),
+                        Symbol::P,
+                        Symbol::AH(Stress::None),
+                        Symbol::L,
                     ]
                 )));
-                */
         let abf = d.get("abf");
         assert!(abf.is_none());
     }
