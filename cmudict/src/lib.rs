@@ -273,6 +273,19 @@ mod tests {
                 )));
         let abf = d.get("abf");
         assert!(abf.is_none());
+
+        let unfit = d.get("unfit");
+        assert!(unfit.is_some());
+        assert_eq!(unfit,
+                Some(Rule::new(
+                        "unfit".to_string(),
+                        vec![
+                            Symbol::AH(Stress::None),
+                            Symbol::N,
+                            Symbol::F,
+                            Symbol::IH(Stress::Primary),
+                            Symbol::T]
+                )));
     }
 
     #[test]
