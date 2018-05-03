@@ -1,10 +1,11 @@
-error_chain!{
-    links {
-        Core(::cmudict_core::Error, ::cmudict_core::ErrorKind);
-    }
+use failure::Error;
 
-    foreign_links {
-        IoErr(::std::io::Error);
-        ReqwestErr(::reqwest::Error);
-    }
+pub type Result<T> = ::std::result::Result<T, Error>;
+
+#[derive(Debug, Fail)]
+pub enum Errors {
+    #[fail(display = "io error: {:?}", _0)]
+    IoErr(::std::io::Error),
+    #[fail(display = "reqwest error: {:?}", _0)]
+    ReqwestErr(::reqwest::Error),
 }

@@ -4,7 +4,7 @@ extern crate indexed_line_reader;
 extern crate reqwest;
 extern crate tempdir;
 extern crate radix_trie;
-#[macro_use] extern crate error_chain;
+#[macro_use] extern crate failure;
 #[macro_use] extern crate log;
 
 use std::str::FromStr;
