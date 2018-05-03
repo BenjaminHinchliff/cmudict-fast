@@ -1,8 +1,6 @@
 # CMUSphinx pronunciation dictionary
 
-[![Crates.io](https://img.shields.io/crates/v/cmudict.svg)](https://crates.io/crates/cmudict)
-
-[crates.io](https://crates.io/crates/cmudict) | [Documentation](https://docs.rs/cmudict)
+[![Crates.io](https://img.shields.io/crates/v/cmudict.svg)](https://crates.io/crates/cmudict) [![docs.rs](https://docs.rs/cmudict/badge.svg)](https://docs.rs/cmudict)
 
 This is a rust library for getting pronunciations from the [CMUSphinx][1]
 pronunciation dictionary.
