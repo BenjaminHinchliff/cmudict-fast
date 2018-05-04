@@ -1,6 +1,3 @@
-#![feature(alloc_system)]
-extern crate alloc_system;
-
 extern crate cmudict;
 use cmudict::Cmudict;
 
