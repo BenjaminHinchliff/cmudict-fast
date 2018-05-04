@@ -1,6 +1,7 @@
 //! Core part of the cmudict crate
 //!
 //! This crate contains the logic to parse & construct "rules" from the cmudict text database
+#![deny(missing_docs)]
 #[macro_use] extern crate failure;
 
 use std::str::FromStr;
@@ -10,14 +11,17 @@ use failure::Error;
 
 pub use errors::*;
 
+/// Shortcut for Result<T, failure::Error>
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 mod errors {
+    /// Error that can be thrown while parsing the cmudict file
     #[derive(Debug, Clone, Fail, PartialEq)]
     #[fail(display = "parse error: {}", _0)]
     pub struct ParseError(String);
 
     impl ParseError {
+        /// Constructs a ParseError. Will allocate a new string from the passed slice
         pub fn new(s: &str) -> ParseError {
             ParseError(s.into())
         }
@@ -26,6 +30,7 @@ mod errors {
 
 /// Used by a symbol to indicate what kind of stress it has
 #[derive(Debug, PartialEq, Clone)]
+#[allow(missing_docs)]
 pub enum Stress {
     None,
     Primary,
@@ -34,6 +39,7 @@ pub enum Stress {
 
 /// Represents a single sound
 #[derive(Debug, PartialEq, Clone)]
+#[allow(missing_docs)]
 pub enum Symbol {
     AA(Stress),
     AE(Stress),

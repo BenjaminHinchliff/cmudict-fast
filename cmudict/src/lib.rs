@@ -1,4 +1,5 @@
 //! The pronunciation dictionary from Carnegie Mellon University's CMUSphinx project
+#![deny(missing_docs)]
 extern crate cmudict_core;
 extern crate indexed_line_reader;
 extern crate reqwest;
@@ -26,8 +27,7 @@ pub use errors::*;
 
 mod errors;
 
-/// 
-pub type Index = Mutex<RefCell<IndexedLineReader<BufReader<File>>>>;
+type Index = Mutex<RefCell<IndexedLineReader<BufReader<File>>>>;
 
 /// A dictionary containing words & their pronunciations
 #[derive(Debug)]
