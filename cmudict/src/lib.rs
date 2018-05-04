@@ -314,14 +314,14 @@ mod tests {
 
     #[test]
     fn threads() {
-        let d = Arc::new(Cmudict::new("./resources/cmudict.dict").expect("Colud not create Cmudict"));
+        let d = Arc::new(Cmudict::new("./resources/cmudict.dict").expect("Could not create Cmudict"));
         let words = [
             "hello",
             "apple",
             "rust",
         ];
-        let mut threads = Vec::with_capacity(3);
-        for i in 0..3 {
+        let mut threads = Vec::with_capacity(words.len());
+        for i in 0..words.len() {
             let d = d.clone();
             threads.push(thread::spawn(move || {
                 let word = words[i];
