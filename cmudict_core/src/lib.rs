@@ -71,6 +71,111 @@ pub enum Symbol {
     ZH,
 }
 
+impl Symbol {
+    pub fn is_primary(&self) -> bool {
+        use self::Symbol::*;
+        match self {
+            | AA(Stress::Primary)
+            | AE(Stress::Primary)
+            | AH(Stress::Primary)
+            | AO(Stress::Primary)
+            | AW(Stress::Primary)
+            | AY(Stress::Primary)
+            | EH(Stress::Primary)
+            | ER(Stress::Primary)
+            | EY(Stress::Primary)
+            | IH(Stress::Primary)
+            | IY(Stress::Primary)
+            | OW(Stress::Primary)
+            | OY(Stress::Primary)
+            | UH(Stress::Primary)
+            | UW(Stress::Primary) => true,
+            _ => false
+        }
+    }
+
+    pub fn is_secondary(&self) -> bool {
+        use self::Symbol::*;
+        match self {
+            | AA(Stress::Secondary)
+            | AE(Stress::Secondary)
+            | AH(Stress::Secondary)
+            | AO(Stress::Secondary)
+            | AW(Stress::Secondary)
+            | AY(Stress::Secondary)
+            | EH(Stress::Secondary)
+            | ER(Stress::Secondary)
+            | EY(Stress::Secondary)
+            | IH(Stress::Secondary)
+            | IY(Stress::Secondary)
+            | OW(Stress::Secondary)
+            | OY(Stress::Secondary)
+            | UH(Stress::Secondary)
+            | UW(Stress::Secondary) => true,
+            _ => false
+        }
+    }
+
+    pub fn is_unstressed(&self) -> bool {
+        use self::Symbol::*;
+        match self {
+            | AA(Stress::Primary)
+            | AE(Stress::Primary)
+            | AH(Stress::Primary)
+            | AO(Stress::Primary)
+            | AW(Stress::Primary)
+            | AY(Stress::Primary)
+            | EH(Stress::Primary)
+            | ER(Stress::Primary)
+            | EY(Stress::Primary)
+            | IH(Stress::Primary)
+            | IY(Stress::Primary)
+            | OW(Stress::Primary)
+            | OY(Stress::Primary)
+            | UH(Stress::Primary)
+            | UW(Stress::Primary) => false,
+            | AA(Stress::Secondary)
+            | AE(Stress::Secondary)
+            | AH(Stress::Secondary)
+            | AO(Stress::Secondary)
+            | AW(Stress::Secondary)
+            | AY(Stress::Secondary)
+            | EH(Stress::Secondary)
+            | ER(Stress::Secondary)
+            | EY(Stress::Secondary)
+            | IH(Stress::Secondary)
+            | IY(Stress::Secondary)
+            | OW(Stress::Secondary)
+            | OY(Stress::Secondary)
+            | UH(Stress::Secondary)
+            | UW(Stress::Secondary) => false,
+            _ => true
+        }
+    }
+
+    pub fn is_syllable(&self) -> bool {
+        use self::Symbol::*;
+        match self {
+            | AA(..)
+            | AE(..)
+            | AH(..)
+            | AO(..)
+            | AW(..)
+            | AY(..)
+            | EH(..)
+            | ER(..)
+            | EY(..)
+            | IH(..)
+            | IY(..)
+            | OW(..)
+            | OY(..)
+            | UH(..)
+            | UW(..) => true,
+            _ => false
+        }
+    }
+}
+
 fn parse_error(s: &str) -> Error {
     ErrorKind::ParseError(s.into()).into()
 }
@@ -368,6 +473,10 @@ impl Rule {
             label: label.into(),
             pronunciation: pronunciation,
         }
+    }
+
+    pub fn is_monosyllabic(&self) -> bool {
+        self.pronunciation.iter().filter(|s| s.is_syllable()).count() < 2
     }
 
     /// Retuns a slice of the Symbols for the word
