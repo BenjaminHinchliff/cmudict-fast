@@ -83,6 +83,7 @@ pub enum Symbol {
 }
 
 impl Symbol {
+    /// Returns `true` if the symbol has primary stress
     pub fn is_primary(&self) -> bool {
         use self::Symbol::*;
         match self {
@@ -105,6 +106,7 @@ impl Symbol {
         }
     }
 
+    /// Returns `true` if the symbol has secondary stress
     pub fn is_secondary(&self) -> bool {
         use self::Symbol::*;
         match self {
@@ -127,6 +129,7 @@ impl Symbol {
         }
     }
 
+    /// Returns `true` if the symbol has no stress
     pub fn is_unstressed(&self) -> bool {
         use self::Symbol::*;
         match self {
@@ -164,6 +167,7 @@ impl Symbol {
         }
     }
 
+    /// Returns `true` if the symbol is stressed in some way
     pub fn is_syllable(&self) -> bool {
         use self::Symbol::*;
         match self {
@@ -486,6 +490,7 @@ impl Rule {
         }
     }
 
+    /// Returns `true` if the Rule has only one stressed `Symbol`
     pub fn is_monosyllabic(&self) -> bool {
         self.pronunciation.iter().filter(|s| s.is_syllable()).count() < 2
     }
