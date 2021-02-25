@@ -19,7 +19,7 @@ the object and uses more memory, but for the application I initially created thi
 the lookup time was essential. To adress the obvious, yes, this is slower than a hashmap
 since it uses a [Radix tree][3] internally (like
 the original crate). Still, it's much faster than the range-based file lookup or whatever
-you'd call it old crate used, while also being lass complicated.
+you'd call it old crate used, while also being less complicated.
 
 ## Installation
 
