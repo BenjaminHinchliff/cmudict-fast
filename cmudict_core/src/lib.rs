@@ -172,18 +172,6 @@ impl Symbol {
     }
 }
 
-// fn parse_error(s: &str) -> Error {
-//     ParseError::new(s).into()
-// }
-
-// fn ParseError::UnexpectedCharacter(before: &str, after: &str, c: char) -> Error {
-//     parse_error(&format!("Expected {} after {}, got {}", before, after, c))
-// }
-
-// fn ParseError::UnexpectedEOFPartial(before: &str, after: &str) -> Error {
-//     parse_error(&format!("Expected {} after {}, got EOF", before, after))
-// }
-
 macro_rules! parse_stress {
     ( $next:expr, $symbol:expr ) => {{
         match $next {
