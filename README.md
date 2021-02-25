@@ -7,7 +7,7 @@ The major changes are:
 - switched from the depreciated failure crate to thiserror based errors
 - switched to rust 2018 in the cargo config
 - removed the utility function to download
-- removed a lot of dependencies that were either no longer needed
+- removed a lot of dependencies that were either no longer needed or depreciated
 - fixed hung lookup bug (due to the new internals (I still don't know what caused it))
 - changed the internals so file i/o wasn't needed for every lookup (and as a result simplified them)
 
@@ -51,23 +51,9 @@ fn main() {
 }
 ```
 
-If you don't want to pass your own `cmudict` file, you can call
-`Cmudict::download` instead, and the library will download a copy of the
-dictionary from https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict :
-
-```rust,ignore
-extern crate cmudict;
-
-use cmudict::Cmudict;
-
-fn main() {
-  let dict = Cmudict::download().expect("Couldn't get/make Cmudict");
-}
-```
-
 You can retrieve the pronunciation for a word like this:
 
-```rust,ignore
+```rust
 extern crate cmudict;
 
 use cmudict::Cmudict;
