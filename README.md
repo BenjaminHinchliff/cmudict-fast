@@ -1,6 +1,6 @@
 # CMUSphinx pronunciation dictionary
 
-This is a fork of the rust library for getting pronunciations from the [CMUSphinx][1]
+This is a fork of the [original][1] rust library for getting pronunciations from the [CMUSphinx][2]
 pronunciation dictionary.
 
 The major changes are:
@@ -17,7 +17,7 @@ than the original crate (O(k) where k is the maximum length of all words in
 the dictionary). Of course, there's the downside that it takes longer to create
 the object and uses more memory, but for the application I initially created this for
 the lookup time was essential. To adress the obvious, yes, this is slower than a hashmap
-since it uses a [Radix tree][2] internally (like
+since it uses a [Radix tree][3] internally (like
 the original crate). Still, it's much faster than the range-based file lookup or whatever
 you'd call it old crate used, while also being lass complicated.
 
@@ -79,5 +79,6 @@ fn main() {
 }
 ```
 
-[1]: https://github.com/cmusphinx/cmudict
-[2]: https://en.wikipedia.org/wiki/Radix_tree
+[1]: https://gitlab.com/pwoolcoc/cmudict
+[2]: https://github.com/cmusphinx/cmudict
+[3]: https://en.wikipedia.org/wiki/Radix_tree
