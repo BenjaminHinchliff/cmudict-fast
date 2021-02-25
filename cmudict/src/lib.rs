@@ -2,10 +2,7 @@
 #![deny(missing_docs)]
 extern crate cmudict_core;
 extern crate indexed_line_reader;
-extern crate reqwest;
-extern crate tempdir;
 extern crate radix_trie;
-#[macro_use] extern crate failure;
 #[macro_use] extern crate log;
 
 use std::str::FromStr;
@@ -18,7 +15,6 @@ use std::path::{Path, PathBuf};
 use std::collections::HashSet;
 
 use radix_trie::Trie;
-use tempdir::TempDir;
 use indexed_line_reader::IndexedLineReader;
 
 pub use cmudict_core::{Rule, Stress, Symbol};
@@ -71,46 +67,13 @@ impl Cmudict {
         })
     }
 
-    /// Downloads the latest cmudict from https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict
-    /// and uses it to construct a new `Cmudict` struct
-    ///
-    /// NB: this will create a temporary directory (using https://crates.io/crates/tempdir) to
-    /// place the dictionary in
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// extern crate cmudict;
-    /// use cmudict::Cmudict;
-    /// # use cmudict::Result;
-    /// # 
-    /// # fn main() {
-    /// #   if let Err(_) = run() {
-    /// #     panic!("error");
-    /// #   }
-    /// # }
-    /// # fn run() -> Result<()> {
-    ///
-    /// let dict = Cmudict::download()?;
-    ///
-    /// #   Ok(())
-    /// # }
-    /// ```
-    pub fn download() -> Result<Cmudict> {
-        let tmpdir = TempDir::new("cmudict")?;
-        let path = tmpdir.path().join("cmudict.dict");
-        let mut file = OpenOptions::new().create(true).write(true).open(&path)?;
-        let mut r = reqwest::get("https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict")?;
-        r.copy_to(&mut file)?;
-        Cmudict::new(&path)
-    }
-
     fn get_index_val(&self, s: &str) -> Option<(usize, usize)> {
         let idx = if s.len() < 2 {
             self.index.get(&s[..]).map(|u| *u)
         } else {
             self.index.get(&s[..2]).map(|u| *u)
         };
+        println!("{:?}", idx);
         idx
     }
 
@@ -174,6 +137,7 @@ impl Cmudict {
                         }
                     }
                 };
+                println!("{}", line);
                 let word = if let Some(word) = left(&line) {
                     word
                 } else {
@@ -290,27 +254,7 @@ mod tests {
                             Symbol::IH(Stress::Primary),
                             Symbol::T]
                 )));
-    }
-
-    #[test]
-    fn using_tempdir() {
-        let d = Cmudict::download().expect("Could not create Cmudict");
-        let abc = d.get("abc");
-        assert!(abc.is_some());
-        assert_eq!(abc,
-                Some(Rule::new(
-                    "abc".to_string(),
-                    vec![
-                        Symbol::EY(Stress::Primary),
-                        Symbol::B,
-                        Symbol::IY(Stress::Secondary),
-                        Symbol::S,
-                        Symbol::IY(Stress::Secondary)
-                    ]
-                )));
-        let abf = d.get("abf");
-        assert!(abf.is_none());
-    }
+    } 
 
     #[test]
     fn threads() {
