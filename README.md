@@ -1,9 +1,25 @@
 # CMUSphinx pronunciation dictionary
 
-[![build](https://gitlab.com/pwoolcoc/cmudict/badges/master/pipeline.svg)](https://gitlab.com/pwoolcoc/cmudict/commits/master) [![Crates.io](https://img.shields.io/crates/v/cmudict.svg)](https://crates.io/crates/cmudict) [![docs.rs](https://docs.rs/cmudict/badge.svg)](https://docs.rs/cmudict)
-
-This is a rust library for getting pronunciations from the [CMUSphinx][1]
+This is a fork of the rust library for getting pronunciations from the [CMUSphinx][1]
 pronunciation dictionary.
+
+The major changes are:
+- switched from the depreciated failure crate to thiserror based errors
+- switched to rust 2018 in the cargo config
+- removed the utility function to download
+- removed a lot of dependencies that were either no longer needed
+- fixed hung lookup bug (due to the new internals (I still don't know what caused it))
+- changed the internals so file i/o wasn't needed for every lookup (and as a result simplified them)
+
+The last of those changes is where the name comes from - as a result of the entire
+dictionary being loaded into volitile memory, each individual lookup is *much* faster
+than the original crate (O(k) where k is the maximum length of all words in
+the dictionary). Of course, there's the downside that it takes longer to create
+the object and uses more memory, but for the application I initially created this for
+the lookup time was essential. To adress the obvious, yes, this is slower than a hashmap
+since it uses a [Radix tree][2] internally (like
+the original crate). Still, it's much faster than the range-based file lookup or whatever
+you'd call it old crate used, while also being lass complicated.
 
 ## Installation
 
@@ -64,3 +80,4 @@ fn main() {
 ```
 
 [1]: https://github.com/cmusphinx/cmudict
+[2]: https://en.wikipedia.org/wiki/Radix_tree
