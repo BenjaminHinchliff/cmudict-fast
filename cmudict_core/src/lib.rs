@@ -1,32 +1,13 @@
 //! Core part of the cmudict crate
 //!
 //! This crate contains the logic to parse & construct "rules" from the cmudict text database
-#![deny(missing_docs)]
-#[macro_use] extern crate failure;
+//#![deny(missing_docs)]
 
 use std::str::FromStr;
 use std::fmt;
 
-use failure::Error;
-
+mod errors;
 pub use errors::*;
-
-/// Shortcut for Result<T, failure::Error>
-pub type Result<T> = ::std::result::Result<T, Error>;
-
-mod errors {
-    /// Error that can be thrown while parsing the cmudict file
-    #[derive(Debug, Clone, Fail, PartialEq)]
-    #[fail(display = "parse error: {}", _0)]
-    pub struct ParseError(String);
-
-    impl ParseError {
-        /// Constructs a ParseError. Will allocate a new string from the passed slice
-        pub fn new(s: &str) -> ParseError {
-            ParseError(s.into())
-        }
-    }
-}
 
 /// Used by a symbol to indicate what kind of stress it has
 #[derive(Debug, PartialEq, Clone)]
@@ -191,17 +172,17 @@ impl Symbol {
     }
 }
 
-fn parse_error(s: &str) -> Error {
-    ParseError::new(s).into()
-}
+// fn parse_error(s: &str) -> Error {
+//     ParseError::new(s).into()
+// }
 
-fn parse_error_expect(before: &str, after: &str, c: char) -> Error {
-    parse_error(&format!("Expected {} after {}, got {}", before, after, c))
-}
+// fn ParseError::UnexpectedCharacter(before: &str, after: &str, c: char) -> Error {
+//     parse_error(&format!("Expected {} after {}, got {}", before, after, c))
+// }
 
-fn parse_error_eof(before: &str, after: &str) -> Error {
-    parse_error(&format!("Expected {} after {}, got EOF", before, after))
-}
+// fn ParseError::UnexpectedEOFPartial(before: &str, after: &str) -> Error {
+//     parse_error(&format!("Expected {} after {}, got EOF", before, after))
+// }
 
 macro_rules! parse_stress {
     ( $next:expr, $symbol:expr ) => {{
@@ -209,7 +190,7 @@ macro_rules! parse_stress {
             Some('0') | None => Ok($symbol(Stress::None)),
             Some('1') => Ok($symbol(Stress::Primary)),
             Some('2') => Ok($symbol(Stress::Secondary)),
-            Some(c) => Err(parse_error(&format!("Expected stress marker '0', '1', or '2', got {}", c))),
+            Some(c) => Err(ParseError::ExpectedStress(c)),
         }
     }}
 }
@@ -349,13 +330,13 @@ impl fmt::Display for Symbol {
 }
 
 impl FromStr for Symbol {
-    type Err = Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Symbol> {
         let mut chrs = s.chars();
 
         match chrs.next() {
-            None => Err(parse_error("Expected character, got EOF")),
+            None => Err(ParseError::UnexpectedEOF("character")),
             Some('A') => {
                 match chrs.next() {
                     Some('A') => parse_stress!( chrs.next(), Symbol::AA ),
@@ -364,8 +345,8 @@ impl FromStr for Symbol {
                     Some('O') => parse_stress!( chrs.next(), Symbol::AO ),
                     Some('W') => parse_stress!( chrs.next(), Symbol::AW ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::AY ),
-                    Some(c) => Err(parse_error_expect("A, E, H, O, W, or Y", "A", c)),
-                    None => Err(parse_error_eof("A, E, H, O, W, or Y", "A")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("A, E, H, O, W, or Y", "A", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("A, E, H, O, W, or Y", "A")),
                 }
             },
             Some('E') => {
@@ -373,47 +354,47 @@ impl FromStr for Symbol {
                     Some('H') => parse_stress!( chrs.next(), Symbol::EH ),
                     Some('R') => parse_stress!( chrs.next(), Symbol::ER ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::EY ),
-                    Some(c) => Err(parse_error_expect("H, R, or Y", "E", c)),
-                    None => Err(parse_error_eof("H, R, or Y", "E")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H, R, or Y", "E", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("H, R, or Y", "E")),
                 }
             },
             Some('I') => {
                 match chrs.next() {
                     Some('H') => parse_stress!( chrs.next(), Symbol::IH ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::IY ),
-                    Some(c) => Err(parse_error_expect("H or Y", "I", c)),
-                    None => Err(parse_error_eof("H or Y", "I")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H or Y", "I", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("H or Y", "I")),
                 }
             },
             Some('O') => {
                 match chrs.next() {
                     Some('W') => parse_stress!( chrs.next(), Symbol::OW ),
                     Some('Y') => parse_stress!( chrs.next(), Symbol::OY ),
-                    Some(c) => Err(parse_error_expect("W or Y", "O", c)),
-                    None => Err(parse_error_eof("W or Y", "O")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("W or Y", "O", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("W or Y", "O")),
                 }
             },
             Some('U') => {
                 match chrs.next() {
                     Some('H') => parse_stress!( chrs.next(), Symbol::UH ),
                     Some('W') => parse_stress!( chrs.next(), Symbol::UW ),
-                    Some(c) => Err(parse_error_expect("H or W", "U", c)),
-                    None => Err(parse_error_eof("H or W", "U")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H or W", "U", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("H or W", "U")),
                 }
             },
             Some('B') => Ok(Symbol::B),
             Some('C') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::CH),
-                    Some(c) => Err(parse_error_expect("H", "C", c)),
-                    None => Err(parse_error_eof("H", "C")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H", "C", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("H", "C")),
                 }
             },
             Some('D') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::DH),
                     None => Ok(Symbol::D),
-                    Some(c) => Err(parse_error_expect("H or EOF", "D", c)),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H or EOF", "D", c)),
                 }
             },
             Some('F') => Ok(Symbol::F),
@@ -421,15 +402,15 @@ impl FromStr for Symbol {
             Some('H') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::HH),
-                    Some(c) => Err(parse_error_expect("H", "H", c)),
-                    None => Err(parse_error_eof("H", "H")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H", "H", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("H", "H")),
                 }
             },
             Some('J') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::JH),
-                    Some(c) => Err(parse_error_expect("H", "J", c)),
-                    None => Err(parse_error_eof("H", "J")),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H", "J", c)),
+                    None => Err(ParseError::UnexpectedEOFAfter("H", "J")),
                 }
             },
             Some('K') => Ok(Symbol::K),
@@ -439,7 +420,7 @@ impl FromStr for Symbol {
                 match chrs.next() {
                     Some('G') => Ok(Symbol::NG),
                     None => Ok(Symbol::N),
-                    Some(c) => Err(parse_error_expect("G or EOF", "N", c)),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("G or EOF", "N", c)),
                 }
             },
             Some('P') => Ok(Symbol::P),
@@ -448,14 +429,14 @@ impl FromStr for Symbol {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::SH),
                     None => Ok(Symbol::S),
-                    Some(c) => Err(parse_error_expect("H or EOF", "S", c)),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H or EOF", "S", c)),
                 }
             },
             Some('T') => {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::TH),
                     None => Ok(Symbol::T),
-                    Some(c) => Err(parse_error_expect("H or EOF", "T", c)),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H or EOF", "T", c)),
                 }
             },
             Some('V') => Ok(Symbol::V),
@@ -465,10 +446,10 @@ impl FromStr for Symbol {
                 match chrs.next() {
                     Some('H') => Ok(Symbol::ZH),
                     None => Ok(Symbol::Z),
-                    Some(c) => Err(parse_error_expect("H or EOF", "Z", c)),
+                    Some(c) => Err(ParseError::UnexpectedCharacterAfter("H or EOF", "Z", c)),
                 }
             },
-            Some(c) => Err(parse_error(&format!("Expected A-Z, got {}", c))),
+            Some(c) => Err(ParseError::UnexpectedCharacter("A-Z", c)),
         }
     }
 }
@@ -507,11 +488,11 @@ impl Rule {
 }
 
 impl FromStr for Rule {
-    type Err = Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Rule> {
         let mut iter = s.split_whitespace().filter(|s| !s.is_empty());
-        let label = iter.next().ok_or(parse_error(&format!("Expected label, found EOF")))?;
+        let label = iter.next().ok_or(ParseError::UnexpectedEOF("label"))?;
 
         let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<Result<Vec<_>>>()?;
 
