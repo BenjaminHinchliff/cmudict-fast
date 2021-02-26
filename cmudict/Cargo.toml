@@ -2,10 +2,13 @@
 name = "cmudict"
 edition = "2018"
 version = "0.4.0"
-authors = ["Paul Woolcock <paul@woolcock.us>"]
-repository = "https://gitlab.com/pwoolcoc/cmudict"
-homepage = "https://github.com/pwoolcoc/cmudict"
-license = "MIT/Apache-2.0"
+authors = [
+    "Benjamin Hinchliff <benjamin.hinchiff@gmail.com>",
+    "Paul Woolcock <paul@woolcock.us>",
+]
+repository = "https://github.com/BenjaminHinchliff/cmudict-fast.git"
+homepage = "https://github.com/BenjaminHinchliff/cmudict-fast"
+license = "Apache-2.0"
 documentation = "https://docs.rs/cmudict"
 description = """
 Library for using the CMUSphinx pronunciation dictionary
