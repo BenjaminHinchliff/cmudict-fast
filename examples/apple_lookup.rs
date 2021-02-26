@@ -1,5 +1,4 @@
-extern crate cmudict;
-use cmudict::Cmudict;
+use cmudict_fast::Cmudict;
 
 fn main() {
     let dict = Cmudict::new("./resources/cmudict.dict").expect("couldn't load dict");
