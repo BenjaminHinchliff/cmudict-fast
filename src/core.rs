@@ -6,8 +6,7 @@
 use std::str::FromStr;
 use std::fmt;
 
-mod errors;
-pub use errors::*;
+use super::errors::{ParseError, ParseResult};
 
 /// Used by a symbol to indicate what kind of stress it has
 #[derive(Debug, PartialEq, Clone)]
@@ -320,7 +319,7 @@ impl fmt::Display for Symbol {
 impl FromStr for Symbol {
     type Err = ParseError;
 
-    fn from_str(s: &str) -> Result<Symbol> {
+    fn from_str(s: &str) -> ParseResult<Symbol> {
         let mut chrs = s.chars();
 
         match chrs.next() {
@@ -478,11 +477,11 @@ impl Rule {
 impl FromStr for Rule {
     type Err = ParseError;
 
-    fn from_str(s: &str) -> Result<Rule> {
+    fn from_str(s: &str) -> ParseResult<Rule> {
         let mut iter = s.split_whitespace().filter(|s| !s.is_empty());
         let label = iter.next().ok_or(ParseError::UnexpectedEOF("label"))?;
 
-        let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<Result<Vec<_>>>()?;
+        let symbols: Vec<_> = iter.map(|s| Symbol::from_str(s)).collect::<ParseResult<Vec<_>>>()?;
 
         Ok(Rule::new(label.to_string(), symbols))
     }

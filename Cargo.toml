@@ -1,5 +1,19 @@
-[workspace]
-members = [
-    "cmudict_core/",
-    "cmudict/",
+[package]
+name = "cmudict"
+edition = "2018"
+version = "0.4.0"
+authors = [
+    "Benjamin Hinchliff <benjamin.hinchiff@gmail.com>",
+    "Paul Woolcock <paul@woolcock.us>",
 ]
+repository = "https://github.com/BenjaminHinchliff/cmudict-fast.git"
+homepage = "https://github.com/BenjaminHinchliff/cmudict-fast"
+license = "Apache-2.0"
+documentation = "https://docs.rs/cmudict-fast"
+description = """
+Library for using the CMUSphinx pronunciation dictionary
+"""
+
+[dependencies]
+radix_trie = "0.2.1"
+thiserror = "1.0.24"

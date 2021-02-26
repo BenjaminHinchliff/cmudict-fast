@@ -9,11 +9,12 @@ use std::str::FromStr;
 
 use radix_trie::Trie;
 
-pub use cmudict_core::{Rule, Stress, Symbol};
-
-pub use errors::*;
-
+mod core;
 mod errors;
+
+pub use crate::core::{Rule, Stress, Symbol};
+pub use errors::{Error, Result, ParseError, ParseResult};
+
 
 /// A dictionary containing words & their pronunciations
 #[derive(Debug)]
@@ -127,7 +128,7 @@ mod tests {
     use super::*;
     use std::thread;
     use std::sync::Arc;
-    use cmudict_core::{Rule, Symbol, Stress};
+    use super::core::{Rule, Symbol, Stress};
 
     #[test]
     fn test_basics() {

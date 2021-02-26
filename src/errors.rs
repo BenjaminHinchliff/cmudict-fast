@@ -1,7 +1,22 @@
-use thiserror::Error;
+/// Enum of possible errors
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    /// Wraps a std::io::Error
+    #[error("io error: {0}")]
+    IoErr(#[from] ::std::io::Error),
+    /// Handles case where label and pronunciation aren't separated
+    #[error("line {0} is missing a space and so cannot be properly split")]
+    InvalidLine(usize),
+    #[error("rule parse error: {0}")]
+    /// Wraps errors coming from parsing rules with cmudict_core
+    RuleParseError(#[from] ParseError),
+}
+
+/// Shortcut for Result<T, errors::Error>
+pub type Result<T> = ::std::result::Result<T, Error>;
 
 /// Enum for all possible parse errors
-#[derive(Debug, Clone, Error, PartialEq)]
+#[derive(Debug, Clone, thiserror::Error, PartialEq)]
 pub enum ParseError {
     /// An invalid stress marker was parsed
     #[error("Expected stress marker '0', '1', or '2', got {0}")]
@@ -20,5 +35,6 @@ pub enum ParseError {
     UnexpectedCharacterAfter(&'static str, &'static str, char),
 }
 
-/// Shortcut for Result<T, failure::Error>
-pub type Result<T> = ::std::result::Result<T, ParseError>;
+/// Shortcut for Result<T, errors::ParseError>
+pub type ParseResult<T> = ::std::result::Result<T, ParseError>;
+
