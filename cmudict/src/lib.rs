@@ -1,5 +1,5 @@
 //! The pronunciation dictionary from Carnegie Mellon University's CMUSphinx project
-//#![deny(missing_docs)]
+#![deny(missing_docs)]
 
 use std::io::{BufReader, BufRead};
 use std::fs::{File};
@@ -45,7 +45,7 @@ impl Cmudict {
     /// ```
     pub fn new<P: AsRef<Path>>(dict: P) -> Result<Cmudict> {
         let path = dict.as_ref();
-        let index = make_index(&path)?;
+        let index = make_mapping(&path)?;
         Ok(Cmudict {
             index: index,
         })
@@ -95,7 +95,7 @@ fn left(s: &str) -> &str {
     parts.next().unwrap()
 }
 
-fn make_index<P: AsRef<Path>>(file: P) -> Result<Trie<String, Rule>> {
+fn make_mapping<P: AsRef<Path>>(file: P) -> Result<Trie<String, Rule>> {
     let file = File::open(&file)?;
     let reader = BufReader::new(file);
     let mut map = Trie::new();
