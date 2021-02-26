@@ -17,6 +17,9 @@ pronunciation dictionary
 readme = "README.md"
 keywords = ["cmudict"]
 categories = ["parser-implementations"]
+exclude = [
+    ".github/**/*"
+]
 
 [features]
 all = ["serialization"]
