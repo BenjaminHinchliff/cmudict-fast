@@ -7,15 +7,23 @@ pronunciation dictionary.
 > 0.5.0 or before is mostly api compatible but notably doesn't have the
 > download utility function.
 
-The major changes are:
-- switched from the depreciated `failure` crate to `thiserror` based errors
-- switched to rust 2018 in the cargo config
-- removed the utility function to download
-- removed a lot of dependencies that were either no longer needed or depreciated
-- fixed hung lookup bug (due to the new internals)
-- changed the internals so file i/o wasn't needed for every lookup (and as a result simplified them)
-- merged `cmudict_core` and `cmudict` into one crate
-- as of 0.6.0 the get function return a slice of all potential pronunciations
+## Changelog
+- 0.7.0
+  - added ability to be serialized and deserialized with serde behind "serialization" feature
+- 0.6.0
+  - changed get function to return a slice of all potential pronunciations
+- 0.5.0
+  - merged `cmudict_core` and `cmudict` into one crate
+  - added back rhyme function that got lost in the chaos
+- 0.4.1
+  - patch to bring fixed readme onto crates.io
+- 0.4.0
+  - switched from the depreciated `failure` crate to `thiserror` based errors
+  - switched to rust 2018 in the cargo config
+  - removed the utility function to download
+  - removed a lot of dependencies that were either no longer needed or depreciated
+  - fixed hung lookup bug (due to the new internals)
+  - changed the internals so file i/o wasn't needed for every lookup (and as a result simplified them)
 
 The last of those changes is where the name comes from - as a result of the entire
 dictionary being loaded into volitile memory, each individual lookup is *much* faster
