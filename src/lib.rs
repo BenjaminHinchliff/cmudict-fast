@@ -28,7 +28,7 @@ impl Cmudict {
     /// # Example
     ///
     /// ```
-    /// extern crate cmudict;
+    /// use cmudict_fast as cmudict;
     /// use cmudict::Cmudict;
     /// # use cmudict::Result;
     /// #
@@ -57,8 +57,7 @@ impl Cmudict {
     /// # Example
     ///
     /// ```rust
-    /// extern crate cmudict;
-    ///
+    /// use cmudict_fast as cmudict;
     /// use cmudict::{Cmudict, Symbol, Stress};
     /// # use cmudict::Result;
     /// # 
