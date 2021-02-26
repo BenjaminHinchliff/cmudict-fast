@@ -1,7 +1,7 @@
 //! Core part of the cmudict crate
 //!
 //! This crate contains the logic to parse & construct "rules" from the cmudict text database
-//#![deny(missing_docs)]
+#![deny(missing_docs)]
 
 use std::str::FromStr;
 use std::fmt;
