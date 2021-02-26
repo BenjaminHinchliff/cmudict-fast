@@ -22,7 +22,6 @@ exclude = [
 ]
 
 [features]
-all = ["serialization"]
 serialization = ["serde"]
 
 [dependencies]
