@@ -27,13 +27,7 @@ To use in your `rust` project, add the following to your `Cargo.toml`:
 
 ```toml,ignore
 [dependencies]
-cmudict = "0.3"
-```
-
-then in your crate root:
-
-```rust,ignore
-extern crate cmudict;
+cmudict-fast = "0.4"
 ```
 
 ## Usage
@@ -42,9 +36,7 @@ To use the dictionary, you have to get an instance of the `Cmudict`
 struct:
 
 ```rust,ignore
-extern crate cmudict;
-
-use cmudict::Cmudict;
+use cmudict_fast::Cmudict;
 
 fn main() {
   let dict = Cmudict::new("./path/to/a/cmudict/file").expect("Couldn't make Cmudict");
@@ -54,12 +46,10 @@ fn main() {
 You can retrieve the pronunciation for a word like this:
 
 ```rust
-extern crate cmudict;
-
-use cmudict::Cmudict;
+use cmudict_fast::Cmudict;
 
 fn main() {
-  let dict = Cmudict::download().expect("Couldn't get/make Cmudict");
+  let dict = Cmudict::new("path/to/cmudict").expect("Couldn't get/make Cmudict");
   let word = dict.get("apple").unwrap().pronunciation();
   println!("{:?}", word); // &[Symbol::AE(Stress::Primary), Symbol::P, Symbol::AH(Stress::None), Symbol::L]
 }
