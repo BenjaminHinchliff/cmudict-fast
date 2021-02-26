@@ -8,7 +8,7 @@ authors = [
 ]
 repository = "https://github.com/BenjaminHinchliff/cmudict-fast.git"
 homepage = "https://github.com/BenjaminHinchliff/cmudict-fast"
-license = "Apache-2.0"
+license = "MIT/Apache-2.0"
 documentation = "https://docs.rs/cmudict-fast"
 description = """
 Library for using the CMUSphinx pronunciation dictionary
