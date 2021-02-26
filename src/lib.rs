@@ -1,13 +1,11 @@
 //! The pronunciation dictionary from Carnegie Mellon University's CMUSphinx project
 #![deny(missing_docs)]
 
-use std::convert::AsRef;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::str::FromStr;
-
-use radix_trie::Trie;
+use std::{collections::HashMap};
 
 mod core;
 mod errors;
@@ -18,7 +16,7 @@ pub use errors::{Error, ParseError, ParseResult, Result};
 /// A dictionary containing words & their pronunciations
 #[derive(Debug)]
 pub struct Cmudict {
-    index: Trie<String, Rule>,
+    index: HashMap<String, Vec<Rule>>,
 }
 
 impl Cmudict {
@@ -70,7 +68,7 @@ impl Cmudict {
     ///
     /// assert!(rust.is_some());
     /// assert_eq!(
-    ///     rust.unwrap().pronunciation(),
+    ///     rust.unwrap().first().unwrap().pronunciation(),
     ///     &[Symbol::R,
     ///       Symbol::AH(Stress::Primary),
     ///       Symbol::S,
@@ -79,25 +77,30 @@ impl Cmudict {
     /// #   Ok(())
     /// # }
     /// ```
-    pub fn get(&self, s: &str) -> Option<&Rule> {
+    pub fn get(&self, s: &str) -> Option<&Vec<Rule>> {
         self.index.get(s)
     }
 }
 
 /// tests whether two words rhyme
-pub fn rhymes(one: &Rule, two: &Rule) -> bool {
-    let one = one.pronunciation();
-    let two = two.pronunciation();
-    if let (Some(left), Some(right)) = (
-        one.iter().rposition(|s| s.is_syllable()),
-        two.iter().rposition(|s| s.is_syllable()),
-    ) {
-        let one = &one[left..];
-        let two = &two[right..];
-        one == two
-    } else {
-        false
+pub fn rhymes(ones: &[Rule], twos: &[Rule]) -> bool {
+    for one in ones {
+        for two in twos {
+            let one = one.pronunciation();
+            let two = two.pronunciation();
+            if let (Some(left), Some(right)) = (
+                one.iter().rposition(|s| s.is_syllable()),
+                two.iter().rposition(|s| s.is_syllable()),
+            ) {
+                let one = &one[left..];
+                let two = &two[right..];
+                if one == two {
+                    return true;
+                }
+            }
+        }
     }
+    false
 }
 
 /* Helper functions */
@@ -108,10 +111,10 @@ fn left(s: &str) -> &str {
     parts.next().unwrap()
 }
 
-fn make_mapping<P: AsRef<Path>>(file: P) -> Result<Trie<String, Rule>> {
+fn make_mapping<P: AsRef<Path>>(file: P) -> Result<HashMap<String, Vec<Rule>>> {
     let file = File::open(&file)?;
     let reader = BufReader::new(file);
-    let mut map = Trie::new();
+    let mut map = HashMap::new();
     for (idx, line) in reader.lines().enumerate() {
         let line = line?;
         if line.starts_with(";;") {
@@ -123,7 +126,8 @@ fn make_mapping<P: AsRef<Path>>(file: P) -> Result<Trie<String, Rule>> {
             .ok_or_else(|| Error::InvalidLine(idx))?;
         let label = split_label(label).to_string();
         let rule = Rule::from_str(left(&line))?;
-        map.insert(label, rule);
+        let rules = map.entry(label).or_insert_with(|| Vec::new());
+        rules.push(rule);
     }
     Ok(map)
 }
@@ -145,14 +149,17 @@ mod tests {
     use std::sync::Arc;
     use std::thread;
 
+    use pretty_assertions::assert_eq;
+
     #[test]
     fn test_basics() {
         let d = Cmudict::new("./resources/cmudict.dict").expect("Could not create Cmudict");
         let apple = d.get("apple");
         assert!(apple.is_some());
+        let apple = apple.unwrap().first().unwrap();
         assert_eq!(
             apple,
-            Some(&Rule::new(
+            &Rule::new(
                 "apple".to_string(),
                 vec![
                     Symbol::AE(Stress::Primary),
@@ -160,16 +167,17 @@ mod tests {
                     Symbol::AH(Stress::None),
                     Symbol::L,
                 ]
-            ))
+            )
         );
         let abf = d.get("abf");
         assert!(abf.is_none());
 
         let unfit = d.get("unfit");
         assert!(unfit.is_some());
+        let unfit = unfit.unwrap().first().unwrap();
         assert_eq!(
             unfit,
-            Some(&Rule::new(
+            &Rule::new(
                 "unfit".to_string(),
                 vec![
                     Symbol::AH(Stress::None),
@@ -178,8 +186,25 @@ mod tests {
                     Symbol::IH(Stress::Primary),
                     Symbol::T
                 ]
-            ))
+            )
         );
+
+        let every = d.get("every").unwrap();
+        let result = vec![
+            Rule::new("every".to_string(), vec![
+                Symbol::EH(Stress::Primary),
+                Symbol::V,
+                Symbol::ER(Stress::None),
+                Symbol::IY(Stress::None)
+            ]),
+            Rule::new("every(2)".to_string(), vec![
+                Symbol::EH(Stress::Primary),
+                Symbol::V,
+                Symbol::R,
+                Symbol::IY(Stress::None),
+            ]),
+        ];
+        assert_eq!(every, &result);
     }
 
     #[test]
