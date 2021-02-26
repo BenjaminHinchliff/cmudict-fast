@@ -77,8 +77,8 @@ impl Cmudict {
     /// #   Ok(())
     /// # }
     /// ```
-    pub fn get(&self, s: &str) -> Option<&Vec<Rule>> {
-        self.index.get(s)
+    pub fn get(&self, s: &str) -> Option<&[Rule]> {
+        self.index.get(s).map(|r| &r[..])
     }
 }
 
