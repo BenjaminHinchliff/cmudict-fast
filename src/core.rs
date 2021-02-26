@@ -6,10 +6,14 @@
 use std::str::FromStr;
 use std::fmt;
 
+#[cfg(feature = "serialization")]
+use serde::{Serialize, Deserialize};
+
 use super::errors::{ParseError, ParseResult};
 
 /// Used by a symbol to indicate what kind of stress it has
 #[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
 #[allow(missing_docs)]
 pub enum Stress {
     None,
@@ -19,6 +23,7 @@ pub enum Stress {
 
 /// Represents a single sound
 #[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
 #[allow(missing_docs)]
 pub enum Symbol {
     AA(Stress),
@@ -443,6 +448,7 @@ impl FromStr for Symbol {
 
 /// Represents the complete pronunciation of a single word in the database
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
 pub struct Rule {
     label: String,
     pronunciation: Vec<Symbol>,

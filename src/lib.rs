@@ -6,6 +6,8 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::str::FromStr;
 use std::{collections::HashMap};
+#[cfg(feature = "serialization")]
+use serde::{Serialize, Deserialize};
 
 mod core;
 mod errors;
@@ -15,8 +17,9 @@ pub use errors::{Error, ParseError, ParseResult, Result};
 
 /// A dictionary containing words & their pronunciations
 #[derive(Debug)]
+#[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
 pub struct Cmudict {
-    index: HashMap<String, Vec<Rule>>,
+    map: HashMap<String, Vec<Rule>>,
 }
 
 impl Cmudict {
@@ -43,8 +46,8 @@ impl Cmudict {
     /// ```
     pub fn new<P: AsRef<Path>>(dict: P) -> Result<Cmudict> {
         let path = dict.as_ref();
-        let index = make_mapping(&path)?;
-        Ok(Cmudict { index: index })
+        let map = make_mapping(&path)?;
+        Ok(Cmudict { map })
     }
 
     /// Look for a word in the dictionary, and retrieve it's pronunciation
@@ -78,7 +81,7 @@ impl Cmudict {
     /// # }
     /// ```
     pub fn get(&self, s: &str) -> Option<&[Rule]> {
-        self.index.get(s).map(|r| &r[..])
+        self.map.get(s).map(|r| &r[..])
     }
 }
 
@@ -236,5 +239,17 @@ mod tests {
         for thread in threads.into_iter() {
             thread.join().unwrap();
         }
+    }
+
+    #[test]
+    #[cfg(feature = "serialization")]
+    fn serialization() {
+        let d = Cmudict::new("./resources/cmudict.dict").expect("couldn't create cmudict");
+
+        let serialized: Vec<u8> = bincode::serialize(&d).unwrap();
+
+        let deserialized: Cmudict = bincode::deserialize(&serialized[..]).unwrap();
+
+        assert_eq!(d.map, deserialized.map);
     }
 }
