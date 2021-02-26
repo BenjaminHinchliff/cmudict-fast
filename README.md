@@ -27,7 +27,7 @@ To use in your `rust` project, add the following to your `Cargo.toml`:
 
 ```toml,ignore
 [dependencies]
-cmudict-fast = "0.4"
+cmudict-fast = "0.5"
 ```
 
 ## Usage
