@@ -1,7 +1,7 @@
 //! The pronunciation dictionary from Carnegie Mellon University's CMUSphinx project
 #![deny(missing_docs)]
 
-use std::fs::File;
+use std::{io::Cursor, fs::File};
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::str::FromStr;
@@ -45,8 +45,9 @@ impl Cmudict {
     /// # }
     /// ```
     pub fn new<P: AsRef<Path>>(dict: P) -> Result<Cmudict> {
-        let path = dict.as_ref();
-        let map = make_mapping(&path)?;
+        let file = File::open(dict)?; 
+        let buf = BufReader::new(file);
+        let map = make_mapping(buf)?;
         Ok(Cmudict { map })
     }
 
@@ -85,6 +86,17 @@ impl Cmudict {
     }
 }
 
+impl FromStr for Cmudict {
+    type Err = Error;
+
+    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
+       let cursor = Cursor::new(s);
+       Ok(Self {
+           map: make_mapping(cursor)?,
+       })
+    }
+}
+
 /// tests whether two words rhyme
 pub fn rhymes(ones: &[Rule], twos: &[Rule]) -> bool {
     for one in ones {
@@ -114,9 +126,7 @@ fn left(s: &str) -> &str {
     parts.next().unwrap()
 }
 
-fn make_mapping<P: AsRef<Path>>(file: P) -> Result<HashMap<String, Vec<Rule>>> {
-    let file = File::open(&file)?;
-    let reader = BufReader::new(file);
+fn make_mapping<R: BufRead>(reader: R) -> Result<HashMap<String, Vec<Rule>>> {
     let mut map = HashMap::new();
     for (idx, line) in reader.lines().enumerate() {
         let line = line?;
