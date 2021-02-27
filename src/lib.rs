@@ -6,7 +6,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::str::FromStr;
 use std::{collections::HashMap};
-#[cfg(feature = "serialization")]
+#[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
 mod core;
@@ -17,7 +17,7 @@ pub use errors::{Error, ParseError, ParseResult, Result};
 
 /// A dictionary containing words & their pronunciations
 #[derive(Debug)]
-#[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Cmudict {
     map: HashMap<String, Vec<Rule>>,
 }
@@ -239,17 +239,5 @@ mod tests {
         for thread in threads.into_iter() {
             thread.join().unwrap();
         }
-    }
-
-    #[test]
-    #[cfg(feature = "serialization")]
-    fn serialization() {
-        let d = Cmudict::new("./resources/cmudict.dict").expect("couldn't create cmudict");
-
-        let serialized: Vec<u8> = bincode::serialize(&d).unwrap();
-
-        let deserialized: Cmudict = bincode::deserialize(&serialized[..]).unwrap();
-
-        assert_eq!(d.map, deserialized.map);
     }
 }
