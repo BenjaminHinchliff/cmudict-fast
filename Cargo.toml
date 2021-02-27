@@ -1,7 +1,7 @@
 [package]
 name = "cmudict-fast"
 edition = "2018"
-version = "0.7.2"
+version = "0.8.0"
 authors = [
     "Benjamin Hinchliff <benjamin.hinchiff@gmail.com>",
     "Paul Woolcock <paul@woolcock.us>",

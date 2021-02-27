@@ -8,6 +8,8 @@ pronunciation dictionary.
 > download utility function.
 
 ## Changelog
+- 0.8.0
+  - implement FromStr for cmudict
 - 0.7.1
   - update version in readme :facepalm:
 - 0.7.0
@@ -39,7 +41,7 @@ To use in your `rust` project, add the following to your `Cargo.toml`:
 
 ```toml,ignore
 [dependencies]
-cmudict-fast = "0.7"
+cmudict-fast = "0.8"
 ```
 
 ## Usage
